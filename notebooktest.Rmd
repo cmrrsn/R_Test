@@ -8,7 +8,62 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
 ```{r}
-plot(cars)
+library(tidyverse)
+library(dplyr)
+
+library(readr)
+gapminder <- read_delim(file = 'C:/Users/Christina/SDC_workshop_20170826/intro-r-20170825/datasets/gapminder_secondtry.txt',
+                        delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+
+summary(gapminder)
+#str(gapminder)
+head(gapminder)
+
+print('PROBLEM 4')
+highgdp <- gapminder %>%
+  filter(gdpPercap == max(gdpPercap))
+print(paste0(highgdp$country, ' has the highest gdp per capita in ', highgdp$year))
+
+lowlife <- gapminder %>% 
+ filter(lifeExp == min(lifeExp))
+print(paste0(lowlife$country, ' has the lowest life expectancy at ', lowlife$lifeExp, ' years '))
+
+lessthan <- gapminder %>%
+    filter(lifeExp < 50)
+nlessthan <- nrow(lessthan)
+print(paste0(nlessthan, ' countries have had a life expectancy lower than 50.'))
+
+asian <- gapminder %>%
+  filter(continent == 'Asia')
+uasian <- unique(asian$country)
+nasian <- length(uasian)
+print(paste0('There are ', nasian, ' countries in the dataset that are located in Asia.'))
+  
+ gapminder <- gapminder %>%
+  mutate(GDP = pop * gdpPercap) 
+
+
+meanpop <- mean(gapminder$pop)
+gapminder$RelationToMean <- NA
+
+
+for (diff in 1:nrow(gapminder)){
+  if (gapminder$pop[diff] > mean(gapminder$pop)) {
+    gapminder$RelationToMean[diff] <- 'Above'
+  } else if (gapminder$pop[diff] < mean(gapminder$pop)) {
+    gapminder$RelationToMean[diff] <- 'Below'
+  } else if (gapminder$pop[diff] == mean(gapminder$pop)) {
+    gapminder$RelationToMean[diff] <- 'At'
+  } else {
+    next()
+  }
+}
+
+ggplot(gapminder, aes(x = year, y = lifeExp, color = continent)) +
+  geom_smooth()
+
+ggplot(gapminder, aes(x = continent, y = gdpPercap, fill = continent)) +
+  geom_boxplot()
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
